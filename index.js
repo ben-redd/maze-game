@@ -1,7 +1,7 @@
 const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter;
 //configuration variables
-const cellsHorizontal = 15;
-const cellsVertical = 13;
+const cellsHorizontal = 5;
+const cellsVertical = 5;
 const width = window.innerWidth;
 const height = window.innerHeight;
 
@@ -55,13 +55,11 @@ const shuffle = (arr) => {
 };
 
 //set up two dimensional arrays
-const grid = Array(cellsVertical).fill(null).map(() => Array(cellsHorizontal).fill(false));
+// let grid = Array(cellsVertical).fill(null).map(() => Array(cellsHorizontal).fill(false));
+// let verticals = Array(cellsVertical).fill(null).map(() => Array(cellsHorizontal - 1).fill(false));
+// let horizontals = Array(cellsVertical - 1).fill(null).map(() => Array(cellsHorizontal).fill(false));
 
-const verticals = Array(cellsVertical).fill(null).map(() => Array(cellsHorizontal - 1).fill(false));
-
-const horizontals = Array(cellsVertical - 1).fill(null).map(() => Array(cellsHorizontal).fill(false));
-
-const stepThroughCell = (row, column) => {
+const stepThroughCell = (row, column, grid, horizontals, verticals) => {
 	//if I have visited the cell at [row, column], then return
 	if (grid[row][column]) {
 		return;
@@ -101,11 +99,11 @@ const stepThroughCell = (row, column) => {
 		}
 
 		//visit next cell
-		stepThroughCell(nextRow, nextColumn, grid, verticals, horizontals);
+		stepThroughCell(nextRow, nextColumn, grid, horizontals, verticals);
 	}
 };
 
-const createWalls = () => {
+const createWalls = (horizontals, verticals) => {
 	horizontals.forEach((row, rowIndex) => {
 		row.forEach((open, columnIndex) => {
 			if (open) {
@@ -228,11 +226,15 @@ Events.on(engine, 'collisionStart', (event) => {
 });
 
 initialize = () => {
+	let grid = Array(cellsVertical).fill(null).map(() => Array(cellsHorizontal).fill(false));
+	let verticals = Array(cellsVertical).fill(null).map(() => Array(cellsHorizontal - 1).fill(false));
+	let horizontals = Array(cellsVertical - 1).fill(null).map(() => Array(cellsHorizontal).fill(false));
+
 	const startRow = Math.floor(Math.random() * cellsVertical);
 	const startColumn = Math.floor(Math.random() * cellsHorizontal);
 	createBorder();
-	stepThroughCell(startRow, startColumn, grid, verticals, horizontals);
-	createWalls(verticals, horizontals);
+	stepThroughCell(startRow, startColumn, grid, horizontals, verticals);
+	createWalls(horizontals, verticals);
 	createGoal();
 	moveBall(createBall());
 };
